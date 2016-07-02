@@ -11,7 +11,7 @@ vm_types:
     ephemeral_disk:
       size: 4_000
       type: gp2
-- name: smurf-bosh
+- name: bosh-smurf
   cloud_properties:
     instance_type: t2.nano
     availability_zone: us-east-1a
@@ -49,7 +49,7 @@ disk_types:
   disk_size: 5_120
   cloud_properties:
     type: gp2
-- name: smurf-bosh
+- name: bosh-smurf
   disk_size: 3_072
   cloud_properties:
     type: gp2

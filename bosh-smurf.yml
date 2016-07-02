@@ -1,5 +1,5 @@
 ---
-name: smurf-bosh
+name: bosh-smurf
 
 director_uuid: beb2169f-8911-453f-98ed-978adcb168c2
 
@@ -18,7 +18,7 @@ stemcells:
   version: latest
 
 instance_groups:
-- name: smurf-bosh
+- name: bosh-smurf-ubuntu
   instances: 1
   stemcell: ubuntu
   jobs:
@@ -29,8 +29,8 @@ instance_groups:
   - {name: postgres, release: bosh}
   - {name: registry, release: bosh}
   - {name: aws_cpi, release: bosh-aws-cpi}
-  vm_type: smurf-bosh
-  persistent_disk_type: smurf-bosh
+  vm_type: bosh-smurf
+  persistent_disk_type: bosh-smurf
 
   networks:
   - name: dynamic
