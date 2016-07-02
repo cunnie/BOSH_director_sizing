@@ -1,4 +1,7 @@
 ---
+# WARNING: Do not attempt to use these deployed BOSH directors -- they
+# will not work. specifically the blobstore address settings, agent settings
+# and registry settings wrongly use the loopback address
 name: bosh-smurf
 
 director_uuid: beb2169f-8911-453f-98ed-978adcb168c2
@@ -19,9 +22,9 @@ stemcells:
 
 instance_groups:
 - name: bosh-smurf-ubuntu
-  instances: 1
+  instances: 32
   stemcell: ubuntu
-  jobs:
+  jobs: &jobs
   - {name: blobstore, release: bosh}
   - {name: director, release: bosh}
   - {name: health_monitor, release: bosh}
@@ -35,7 +38,7 @@ instance_groups:
   networks:
   - name: dynamic
 
-  properties:
+  properties: &properties
     blobstore:
       address: 127.0.0.1
       port: 25250
@@ -93,6 +96,18 @@ instance_groups:
     agent: {mbus: "nats://nats:nats-password@127.0.0.1:4222"}
 
     ntp: &ntp [0.pool.ntp.org, 1.pool.ntp.org]
+
+- name: bosh-smurf-centos
+  instances: 32
+  stemcell: centos
+  jobs: *jobs
+  vm_type: bosh-smurf
+  persistent_disk_type: bosh-smurf
+
+  networks:
+  - name: dynamic
+
+  properties: *properties
 
 update:
   canaries: 0
