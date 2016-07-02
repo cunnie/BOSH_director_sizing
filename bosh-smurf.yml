@@ -95,3 +95,9 @@ instance_groups:
     agent: {mbus: "nats://nats:nats-password@127.0.0.1:4222"}
 
     ntp: &ntp [0.pool.ntp.org, 1.pool.ntp.org]
+
+update:
+  canaries: 0
+  max_in_flight: 10
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
