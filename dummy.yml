@@ -23,14 +23,14 @@ update:
 instance_groups:
 - name: dummy-centos
   jobs: []
-  instances: 32
+  instances: 1
   vm_type: t2.nano
   stemcell: centos
   networks:
   - name: dynamic
 - name: dummy-ubuntu
   jobs: []
-  instances: 32
+  instances: 1
   vm_type: t2.nano
   stemcell: ubuntu
   networks:
