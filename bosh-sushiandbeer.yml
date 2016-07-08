@@ -1,0 +1,102 @@
+---
+# WARNING: Do not attempt to use these deployed BOSH directors -- they
+# will not work. specifically the blobstore address settings, agent settings
+# and registry settings wrongly use the loopback address
+name: bosh-sushiandbeer
+
+director_uuid: beb2169f-8911-453f-98ed-978adcb168c2
+
+releases:
+- name: bosh
+  version: latest
+- name: bosh-aws-cpi
+  version: 53
+
+stemcells:
+- alias: ubuntu
+  os: ubuntu-trusty
+  version: 3262.2
+
+instance_groups:
+- name: bosh-sushiandbeer
+  instances: 1
+  stemcell: ubuntu
+  jobs: &jobs
+  - {name: blobstore, release: bosh}
+  - {name: director, release: bosh}
+  - {name: health_monitor, release: bosh}
+  - {name: nats, release: bosh}
+  - {name: postgres, release: bosh}
+  - {name: registry, release: bosh}
+  - {name: aws_cpi, release: bosh-aws-cpi}
+  vm_type: m3.large
+  persistent_disk_type: bosh-smurf
+
+  networks:
+  - name: dynamic
+
+  properties: &properties
+    blobstore:
+      address: 127.0.0.1
+      port: 25250
+      provider: dav
+      director: {user: director, password: director-password}
+      agent: {user: agent, password: agent-password}
+
+    postgres: &db
+      listen_address: 127.0.0.1
+      host: 127.0.0.1
+      user: postgres
+      password: postgres-password
+      database: bosh
+      adapter: postgres
+
+    director:
+      address: 127.0.0.1
+      name: BOSH
+      db: *db
+      cpi_job: aws_cpi
+      max_threads: 20
+      user_management:
+        provider: local
+        local:
+          users:
+          - {name: admin, password: ADMIN_PASSWORD} # <--- Replace with admin's password
+          - {name: hm, password: hm-password}
+
+    hm:
+      director_account: {user: hm, password: hm-password}
+      resurrector_enabled: true
+
+    nats:
+      address: 127.0.0.1
+      user: nats
+      password: nats-password
+
+    registry:
+      address: 127.0.0.1
+      host: 127.0.0.1
+      db: *db
+      http: {user: admin, password: ADMIN_PASSWORD, port: 25777} # <--- Replace with admin's password
+      username: admin
+      password: ADMIN_PASSWORD # <--- Replace with admin's password
+      port: 25777
+
+    aws: &aws
+      access_key_id: AKIAxxxxxxxxxxxxxxxx # <--- Replace with AWS Access Key ID
+      secret_access_key: 0+B1XW6VVEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # <--- Replace with AWS Secret Key
+      default_key_name: aws_nono
+      # the Security Group MUST have the VPC ID of your VPC (e.g. 'vpc-e4250881')
+      default_security_groups: [bosh]
+      region: us-east-1 # <--- Replace with Region
+
+    agent: {mbus: "nats://nats:nats-password@127.0.0.1:4222"}
+
+    ntp: &ntp [0.pool.ntp.org, 1.pool.ntp.org]
+
+update:
+  canaries: 0
+  max_in_flight: 10
+  canary_watch_time: 30000-60000
+  update_watch_time:  5000-60000
+  serial: false # faster deployments

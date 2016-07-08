@@ -2,6 +2,9 @@ azs:
 - name: z1
   cloud_properties:
     availability_zone: us-east-1a
+- name: z2
+  cloud_properties:
+    availability_zone: us-east-1b
 
 vm_types:
 - name: t2.nano
@@ -39,6 +42,13 @@ vm_types:
     ephemeral_disk:
       size: 4_000
       type: gp2
+- name: m3.large
+  cloud_properties:
+    instance_type: m3.large
+    availability_zone: us-east-1b
+    ephemeral_disk:
+      size: 4_000
+      type: gp2
 
 disk_types:
 - name: concourse
@@ -57,8 +67,10 @@ disk_types:
 networks:
 - name: dynamic
   type: dynamic
-  cloud_properties:
-    subnet: subnet-1c90ef6b
+  subnets:
+  - { az: z2, cloud_properties: {subnet: subnet-0778555f}}
+  - { az: z1, cloud_properties: {subnet: subnet-1c90ef6b}}
+  - { cloud_properties: {subnet: subnet-1c90ef6b}}
 - name: dynamic-concourse
   type: dynamic
   cloud_properties:
@@ -87,6 +99,7 @@ compilation:
   reuse_compilation_vms: true
   vm_type: c4.large
   network: dynamic
+  azs: [z1, z2]
 
 properties:
   aws:
